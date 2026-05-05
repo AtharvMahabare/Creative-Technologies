@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATHARV MAHABRE | SYSTEM ARCHITECT & IT SCHOLAR</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/typed.js@2.0.16/dist/typed.umd.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@200;400;600;900&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-purple: #bc13fe;
+            --bg-black: #020205;
+            --glass: rgba(255, 255, 255, 0.02);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --card-bg: rgba(13, 17, 23, 0.85);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+        body { background-color: var(--bg-black); color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; line-height: 1.6; }
+
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        #cursor { width: 12px; height: 12px; background: var(--neon-blue); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; box-shadow: 0 0 20px var(--neon-blue); transition: transform 0.1s ease; }
+
+        /* --- Navigation --- */
+        nav { position: fixed; width: 100%; padding: 25px 8%; display: flex; justify-content: space-between; align-items: center; z-index: 100; backdrop-filter: blur(30px); border-bottom: 1px solid var(--glass-border); }
+        .logo { font-family: 'Syncopate'; font-weight: 700; color: var(--neon-blue); letter-spacing: 5px; font-size: 1.2rem; }
+        .nav-links a { color: #888; text-decoration: none; margin-left: 35px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--neon-blue); text-shadow: 0 0 15px var(--neon-blue); }
+
+        /* --- Hero Section --- */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 10%; position: relative; }
+        .hero span { color: var(--neon-purple); font-family: 'Syncopate'; letter-spacing: 12px; font-size: 0.8rem; margin-bottom: 15px; }
+        .hero h1 { font-size: clamp(3rem, 12vw, 9.5rem); font-weight: 900; line-height: 0.8; margin: 25px 0; background: linear-gradient(to bottom, #fff 40%, #222 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- Section Labels --- */
+        .section-label { padding: 140px 10% 25px; font-family: 'Syncopate'; font-size: 0.8rem; color: var(--neon-blue); letter-spacing: 8px; border-bottom: 1px solid var(--glass-border); margin-bottom: 70px; margin-inline: 10%; position: relative; }
+        .section-label::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 150px; height: 2px; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+
+        /* --- Content Layouts --- */
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; padding: 0 10% 100px; }
+        .bento-card { background: var(--card-bg); border: 1px solid var(--glass-border); padding: 45px; border-radius: 30px; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bento-card:hover { border-color: var(--neon-blue); transform: translateY(-15px) scale(1.02); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .span-2 { grid-column: span 2; }
+
+        /* --- Academic Timeline --- */
+        .timeline-container { padding: 0 10% 100px; }
+        .timeline-box { display: flex; gap: 40px; margin-bottom: 40px; padding: 40px; background: rgba(255,255,255,0.02); border-radius: 20px; border-left: 4px solid var(--neon-blue); transition: 0.3s; }
+        .timeline-box:hover { background: rgba(0, 243, 255, 0.05); }
+        .year { font-family: 'Syncopate'; font-size: 1.1rem; color: var(--neon-purple); min-width: 150px; }
+        .details h2 { font-size: 1.8rem; margin-bottom: 10px; }
+        .score-pill { display: inline-block; padding: 6px 18px; border: 1px solid var(--neon-blue); border-radius: 50px; font-size: 0.8rem; color: var(--neon-blue); margin-top: 15px; font-weight: 700; }
+
+        /* --- Skill Bars --- */
+        .skill-matrix { padding: 0 10% 100px; display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+        .skill-item { margin-bottom: 25px; }
+        .skill-info { display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 0.8rem; margin-bottom: 10px; color: #aaa; }
+        .skill-bar { height: 6px; background: #111; border-radius: 10px; overflow: hidden; }
+        .skill-progress { height: 100%; background: linear-gradient(to right, var(--neon-purple), var(--neon-blue)); transition: 1.5s ease-in-out; }
+
+        /* --- Concept Showcase --- */
+        .concept-showcase { margin: 0 10% 100px; padding: 80px; border-radius: 40px; background: url('https://images.unsplash.com/photo-1614850523296-d8c1af93d400?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover; position: relative; overflow: hidden; }
+        .concept-showcase::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(2, 2, 5, 0.9); }
+        .concept-content { position: relative; z-index: 1; }
+
+        /* --- Footer & Form --- */
+        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; padding: 0 10% 120px; }
+        .contact-form input, .contact-form textarea { width: 100%; padding: 22px; background: #0a0a0f; border: 1px solid var(--glass-border); color: #fff; border-radius: 15px; margin-bottom: 20px; font-family: 'Inter'; }
+        .submit-trigger { width: 100%; padding: 25px; background: var(--neon-blue); border: none; font-family: 'Syncopate'; font-weight: 900; letter-spacing: 3px; border-radius: 15px; cursor: pointer; color: #000; transition: 0.4s; }
+        .submit-trigger:hover { background: #fff; box-shadow: 0 0 40px var(--neon-blue); transform: scale(1.02); }
+
+        footer { padding: 80px 10%; text-align: center; border-top: 1px solid var(--glass-border); color: #555; font-size: 0.75rem; letter-spacing: 4px; }
+
+        @media (max-width: 1000px) {
+            .grid-3, .skill-matrix, .contact-grid { grid-template-columns: 1fr; }
+            .timeline-box { flex-direction: column; gap: 15px; }
+            .concept-showcase { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cursor"></div>
+    <div id="canvas-container"></div>
+
+    <header>
+        <nav>
+            <div class="logo">ATHARV.IT</div>
+            <div class="nav-links">
+                <a href="#about">Bio</a>
+                <a href="#edu">Archive</a>
+                <a href="#skills">Matrix</a>
+                <a href="#innovation">Forge</a>
+                <a href="#contact">Terminal</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="hero">
+            <span>FULL-STACK ARCHITECT // UE5 PIONEER</span>
+            <h1>MAHABRE<br>ATHARV</h1>
+            <div style="height: 45px;"><p id="typed" style="color: var(--neon-blue); font-family: 'JetBrains Mono'; letter-spacing: 3px; font-weight: 500;"></p></div>
+        </section>
+
+        <!-- ABOUT / IDENTITY -->
+        <section id="about">
+            <div class="section-label">01 // IDENTITY_CORE</div>
+            <div class="grid-3">
+                <article class="bento-card span-2">
+                    <h2 style="font-family: 'Syncopate'; color: #fff; margin-bottom: 25px;">THE ARCHITECT'S VISION</h2>
+                    <p style="font-size: 1.2rem; color: #aaa; line-height: 1.8;">
+                        I am an Information Technology scholar at <strong>MIT Academy of Engineering, Alandi</strong>. My professional framework is built on the convergence of <strong>disciplined logic and creative engineering</strong>. I am not just a developer; I am a problem-solver eager to contribute to the next evolution of digital infrastructure.
+                    </p>
+                    <div style="margin-top: 30px; display: flex; gap: 20px;">
+                        <span class="score-pill">MOTIVATED</span>
+                        <span class="score-pill">DISCIPLINED</span>
+                        <span class="score-pill">INNOVATIVE</span>
+                    </div>
+                </article>
+                <article class="bento-card">
+                    <h3 style="color: var(--neon-purple); font-family: 'Syncopate'; font-size: 0.8rem; margin-bottom: 20px;">SYSTEM_STATUS</h3>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">> PRN: 202501080163</p>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">> DEPT: IT_ENGG</p>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">> ENV: PUNE_IN</p>
+                    <p style="font-size: 0.9rem; color: #666;">> UPTIME: 100%</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- EDUCATION ARCHIVE -->
+        <section id="edu">
+            <div class="section-label">02 // ACADEMIC_CHRONOLOGY</div>
+            <div class="timeline-container">
+                <article class="timeline-box">
+                    <div class="year">2024 - PRESENT</div>
+                    <div class="details">
+                        <h2>MIT Academy of Engineering</h2>
+                        <p style="color: #888;">B.Tech in Information Technology. Pursuing excellence in Alandi, Pune. Focusing on Cloud Systems, Advanced Java, and Database Architecture.</p>
+                        <div class="score-pill">CURRENTLY_ENROLLED</div>
+                    </div>
+                </article>
+
+                <article class="timeline-box">
+                    <div class="year">2022 - 2024</div>
+                    <div class="details">
+                        <h2>Higher Secondary College (HSC)</h2>
+                        <p style="color: #888;">Science stream. Mastered the fundamentals of Calculus, Physics, and Logic Circuits.</p>
+                        <div class="score-pill">RESULT: 80%</div>
+                    </div>
+                </article>
+
+                <article class="timeline-box">
+                    <div class="year">2012 - 2022</div>
+                    <div class="details">
+                        <h2>Amrita Vidyalayam</h2>
+                        <p style="color: #888;">Foundation of academic grit. Consistently led technical initiatives and competitive coding rounds.</p>
+                        <div class="score-pill">RESULT: 94% (SSC)</div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- SKILL MATRIX -->
+        <section id="skills">
+            <div class="section-label">03 // TECHNICAL_MATRIX</div>
+            <div class="skill-matrix">
+                <div class="left-skills">
+                    <div class="skill-item">
+                        <div class="skill-info"><span>HTML5 / CSS3 ARCHITECTURE</span><span>95%</span></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 95%;"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-info"><span>UNREAL ENGINE 5 (BLUEPRINTS)</span><span>85%</span></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 85%;"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-info"><span>UNITY 3D (C#)</span><span>80%</span></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 80%;"></div></div>
+                    </div>
+                </div>
+                <div class="right-skills">
+                    <div class="skill-item">
+                        <div class="skill-info"><span>JAVASCRIPT (ES6+)</span><span>88%</span></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 88%;"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-info"><span>IOT & EMBEDDED LOGIC</span><span>75%</span></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 75%;"></div></div>
+                    </div>
+                    <div class="skill-item">
+                        <div class="skill-info"><span>PROBLEM SOLVING & ALGORITHMS</span><span>90%</span></div>
+                        <div class="skill-bar"><div class="skill-progress" style="width: 90%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GAME INNOVATION CONCEPT -->
+        <section id="innovation">
+            <div class="section-label">04 // INNOVATION_LAB</div>
+            <div class="concept-showcase">
+                <div class="concept-content">
+                    <h2 style="font-family: 'Syncopate'; color: var(--neon-blue); margin-bottom: 25px;">PROJECT: VIRTUAL_PUNE_2099</h2>
+                    <p style="font-size: 1.3rem; max-width: 800px; color: #fff; line-height: 1.6;">
+                        My flagship concept for an <strong>Advanced Open-World Game</strong>. Utilizing Unreal Engine 5's Nanite and Lumen, I am designing a procedurally generated cyber-environment that mimics a futuristic Pune city.
+                    </p>
+                    <div style="margin-top: 40px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div style="padding: 25px; background: rgba(0,0,0,0.5); border-radius: 15px; border: 1px solid var(--neon-purple);">
+                            <h4 style="color: var(--neon-purple);">> NEURAL_AI_NPCs</h4>
+                            <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">Integrating LLMs for dynamic conversations with non-playable characters.</p>
+                        </div>
+                        <div style="padding: 25px; background: rgba(0,0,0,0.5); border-radius: 15px; border: 1px solid var(--neon-purple);">
+                            <h4 style="color: var(--neon-purple);">> DYNAMIC_WEATHER</h4>
+                            <p style="font-size: 0.8rem; color: #888; margin-top: 10px;">Real-time particle systems affecting gameplay physics and visibility.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HOBBIES & PERSONAL -->
+        <section id="hobbies">
+            <div class="section-label">05 // PERSONAL_INTERESTS</div>
+            <div class="grid-3">
+                <article class="bento-card">
+                    <i class="fas fa-baseball-bat-ball" style="font-size: 2.5rem; color: var(--neon-blue); margin-bottom: 25px;"></i>
+                    <h3 style="font-family: 'Syncopate'; font-size: 0.9rem; margin-bottom: 15px;">CRICKET STRATEGY</h3>
+                    <p style="color: #777; font-size: 0.85rem;">Applying game-theory and teamwork principles from the pitch to the code editor.</p>
+                </article>
+                <article class="bento-card">
+                    <i class="fas fa-microchip" style="font-size: 2.5rem; color: var(--neon-blue); margin-bottom: 25px;"></i>
+                    <h3 style="font-family: 'Syncopate'; font-size: 0.9rem; margin-bottom: 15px;">HARDWARE TINKERING</h3>
+                    <p style="color: #777; font-size: 0.85rem;">Repairing legacy systems to understand the historical evolution of IT hardware.</p>
+                </article>
+                <article class="bento-card">
+                    <i class="fas fa-terminal" style="font-size: 2.5rem; color: var(--neon-blue); margin-bottom: 25px;"></i>
+                    <h3 style="font-family: 'Syncopate'; font-size: 0.9rem; margin-bottom: 15px;">OPEN_WORLD_RESEARCH</h3>
+                    <p style="color: #777; font-size: 0.85rem;">Studying game design patterns to perfect player agency and immersive storytelling.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- CONTACT -->
+        <section id="contact">
+            <div class="section-label">06 // SECURE_TERMINAL</div>
+            <div class="contact-grid">
+                <div class="info-pane">
+                    <h2 style="font-family: 'Syncopate'; margin-bottom: 30px;">GET_IN_TOUCH</h2>
+                    <p style="color: #888; margin-bottom: 40px;">Ready for deployment. Open for professional collaborations, internships, and technical research projects.</p>
+                    <div style="font-family: 'JetBrains Mono'; font-size: 1.1rem; color: var(--neon-blue);">
+                        <p style="margin-bottom: 15px;">> EMAIL: atharvanil4734@gmail.com</p>
+                        <p>> PHONE: +91 7620531511</p>
+                    </div>
+                </div>
+                <form class="contact-form">
+                    <input type="text" placeholder="NAME / ORGANIZATION" required>
+                    <input type="email" placeholder="ENCRYPTED_EMAIL" required>
+                    <textarea placeholder="SYSTEM_MESSAGE" rows="5" required></textarea>
+                    <button type="submit" class="submit-trigger">INITIALIZE_COMMUNICATIONS 🚀</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        ATHARV MAHABRE // MITAOE // PRN: 202501080163 // &copy; 2026 // ALL SYSTEMS OPERATIONAL
+    </footer>
+
+    <script>
+        // Custom Cursor Movement
+        const cursor = document.getElementById('cursor');
+        window.addEventListener('mousemove', e => {
+            cursor.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+        });
+
+        // Typing Effect with JetBrains Mono font
+        new Typed('#typed', {
+            strings: ['INITIALIZING_CORE...', 'IT_STUDENT_MITAOE', 'UE5_GAME_ARCHITECT', 'SYSTEM_PROBLEM_SOLVER', 'CRICKET_STRATEGIST'],
+            typeSpeed: 50, backSpeed: 30, loop: true
+        });
+
+        // Enhanced Three.js Background (Starfield)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        const starGeo = new THREE.BufferGeometry();
+        const starCount = 8000;
+        const posArray = new Float32Array(starCount * 3);
+        for(let i=0; i<starCount*3; i++) posArray[i] = (Math.random()-0.5)*2000;
+        starGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const starMesh = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.9, color: 0x00f3ff }));
+        scene.add(starMesh);
+        camera.position.z = 1;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            starMesh.rotation.y += 0.0005;
+            starMesh.rotation.x += 0.0002;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Responsive Resizing
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
